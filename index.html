@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Progress Indicator</title>
+    <link href="./assets/css/indicator.css" rel="stylesheet">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.4/angular.min.js"></script>
+    <script src="./assets/js/d3.v3.min.js"></script> 
+</head>
+<body ng-app="indicator">
+    <div class="widget-container"
+        data-expected="0.75"
+        data-actual="0.555" indicator-widget></div>
+
+    <script type="text/javascript" src="./assets/js/indicator.js"></script>
+    <!-- 
+        So we can test this locally without running a server
+        otherwise it tries to make an XMLHttpRequest.
+
+        CONS: Not cached.
+     -->
+     <script type="text/ng-template" id="indicator.html">
+        <svg class="indicator-circle" 
+            width="150" height="150" 
+            version="1.1" 
+            xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50%" cy="50%" r="50" />
+            <text class="progress-text actual" text-anchor="middle" alignment-baseline="middle" dx="50%" dy="50%">{{ actual_formatted }}%</text>
+            <text class="progress-text" text-anchor="middle" alignment-baseline="middle" dx="50%" dy="67%">Progress</text>
+            <path class="progress-bar all-good" inner-path />
+            <path class="progress-bar" outer-path />
+        </svg>
+     </script>
+</body>
+</html>
