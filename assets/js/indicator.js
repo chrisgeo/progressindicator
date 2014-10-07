@@ -20,6 +20,10 @@ indicator.directive('indicatorWidget', [function (){
                 return angle * (Math.PI / 180);
             }
 
+            function findDegress(percentage){
+                return 360 * percentage;
+            }
+
             $scope.findPathColor = function(){
                 return (diff < 0.25) ? 'all-good' :
                         ((diff >= 0.25 && diff < 0.5) ? 'not-so-good' :
@@ -27,8 +31,8 @@ indicator.directive('indicatorWidget', [function (){
             };
 
             $scope.innerArc = function(){
-                var end = $scope.expected * 100,
-                    radius = $scope.radius + 3; // Move out a little
+                var end = findDegress($scope.expected),
+                    radius = $scope.radius + 8; // Move out a little
 
                 return d3.svg.arc()
                         .innerRadius(radius)
@@ -38,8 +42,8 @@ indicator.directive('indicatorWidget', [function (){
             };
 
             $scope.outerArc = function(){
-                var end = $scope.actual * 100,
-                    radius = $scope.radius + 6; // Move out a little
+                var end = findDegress($scope.actual),
+                    radius = $scope.radius + 14; // Move out a little
 
                 return d3.svg.arc()
                         .innerRadius(radius)
@@ -50,7 +54,7 @@ indicator.directive('indicatorWidget', [function (){
         },
         templateUrl: 'indicator.html',
         link: function(scope, element, attrs){
-            scope.actual_formatted = (scope.actual * 100).toFixed(1);
+            scope.actual_formatted = (scope.actual * 100).toFixed(0);
         },
         scope: {
             actual: '@',
