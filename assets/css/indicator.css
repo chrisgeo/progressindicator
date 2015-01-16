@@ -13,13 +13,13 @@
     font-family: Arial;
 }
 
-.progress-text.percent {
+.progress-text .percent {
     font-size: 18px;
     fill: #5D5D5D;
     font-family: Avenir;
 }
 
-.progress-text.actual {
+.progress-text .actual {
     font-size: 30px;
     fill: #5D5D5D;
     font-family: Avenir;

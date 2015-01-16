@@ -17,6 +17,19 @@
     <div class="widget-container"
         data-expected="0.901"
         data-actual="0.25" indicator-widget></div>
+    <div class="widget-container"
+        data-expected="0.901"
+        data-actual="1.10" indicator-widget></div>
+    <div class="widget-container"
+        data-expected="0.901"
+        data-actual="1.25" indicator-widget></div>
+    <div class="widget-container"
+        data-expected="0.901"
+        data-actual="2.99" indicator-widget></div>
+    <div class="widget-container"
+        data-expected="0.901"
+        data-actual="10.99" indicator-widget></div>
+
     <script type="text/javascript" src="./assets/js/indicator.js"></script>
     <!-- 
         So we can test this locally without running a server
@@ -29,10 +42,14 @@
             width="150" height="150" 
             version="1.1" 
             xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50%" cy="50%" r="45" />
-            <text class="progress-text actual" text-anchor="middle" alignment-baseline="middle" dx="48%" dy="45%">{{ actual_formatted }}</text>
-            <text class="progress-text percent" text-anchor="start" alignment-baseline="middle" dx="58%" dy="47%">%</text>
-            <text class="progress-text" text-anchor="middle" alignment-baseline="middle" dx="50%" dy="60%">Progress</text>
+            <g>
+                <circle cx="50%" cy="50%" r="45" />
+                <text class="progress-text actual" text-anchor="middle" alignment-baseline="middle" dx="50%" dy="50%">
+                    <tspan class="actual">{{ actual_formatted }}</tspan>
+                    <tspan class="percent">%</tspan>
+                </text>
+                <text class="progress-text" text-anchor="middle" alignment-baseline="middle" dx="50%" dy="60%">Progress</text>
+            </g>
             <path class="progress-bar inner-bar normal" stroke-linejoin="round" inner-path />
             <path class="progress-bar outer-bar" stroke-linejoin="round" outer-path />
         </svg>
