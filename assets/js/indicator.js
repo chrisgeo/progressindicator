@@ -8,13 +8,15 @@ indicator.directive('indicatorWidget', [function (){
         transclude: true,
         controller: function($scope, $element, $attrs){
             var diff = ($scope.expected - $scope.actual)/$scope.expected,
-                svg = d3.select($element.find('svg')),
+                canvasWidth = $element.attr('width'),
+                canvasHeight = $element.attr('height'),
                 circle = $element.find('circle')[0],
-                radius = circle.r.baseVal.value,
-                cx = circle.cx,
-                cy = circle.cy;
+                radius = circle.r.baseVal.value;
 
             $scope.radius = radius;
+            $scope.canvasWidth = canvasWidth;
+            $scope.canvasHeight = canvasHeight;
+            $scope.spacing = 0.9;
 
             function convertToRads(angle){
                 return angle * (Math.PI / 180);
@@ -22,6 +24,13 @@ indicator.directive('indicatorWidget', [function (){
 
             function findDegress(percentage){
                 return 360 * percentage;
+            }
+
+            function getArcValues(index, radius, spacing){
+                return {
+                    innerRadius: (index + spacing) * radius,
+                    outerRadius: (index + spacing) * radius
+                };
             }
 
             $scope.findPathColor = function(){
@@ -32,22 +41,24 @@ indicator.directive('indicatorWidget', [function (){
 
             $scope.innerArc = function(){
                 var end = findDegress($scope.expected),
-                    radius = $scope.radius + 8; // Move out a little
+                    index = 1.1,
+                    arcValues = getArcValues(index, $scope.radius, 0.05);
 
                 return d3.svg.arc()
-                        .innerRadius(radius)
-                        .outerRadius(radius)
+                        .innerRadius(arcValues.innerRadius)
+                        .outerRadius(arcValues.outerRadius)
                         .startAngle(0)
                         .endAngle(convertToRads(end));
             };
 
             $scope.outerArc = function(){
                 var end = findDegress($scope.actual),
-                    radius = $scope.radius + 14; // Move out a little
+                    index = 1.2,
+                    arcValues = getArcValues(index, $scope.radius, 0.1);
 
                 return d3.svg.arc()
-                        .innerRadius(radius)
-                        .outerRadius(radius)
+                        .innerRadius(arcValues.innerRadius)
+                        .outerRadius(arcValues.outerRadius)
                         .startAngle(0)
                         .endAngle(convertToRads(end));
             };
@@ -76,7 +87,10 @@ indicator.directive('innerPath', function(){
                         'way-behind');
 
             arc.attr('d', innerArc)
-                .attr("transform", "translate(75,75)");
+                .attr(
+                    "transform", 
+                    "translate("+ scope.canvasWidth/2 + "," + scope.canvasHeight/2 + ")"
+                );
         }
     };
 });
@@ -91,7 +105,10 @@ indicator.directive('outerPath', function(){
                 innerArc = scope.outerArc();
 
             arc.attr('d', innerArc)
-                .attr("transform", "translate(75,75)");
+                .attr(
+                    "transform", 
+                    "translate("+ scope.canvasWidth/2 + "," + scope.canvasHeight/2 + ")"
+                );
 
             element.addClass(scope.findPathColor());
         }
