@@ -17,7 +17,7 @@ indicator.directive('indicatorWidget', [function (){
             $scope.canvasWidth = canvasWidth;
             $scope.canvasHeight = canvasHeight;
             $scope.spacing = 0.9;
-
+            
             function convertToRads(angle){
                 return angle * (Math.PI / 180);
             }
@@ -32,7 +32,7 @@ indicator.directive('indicatorWidget', [function (){
                     outerRadius: (index + spacing) * radius
                 };
             }
-
+            
             $scope.findPathColor = function(){
                 return (diff < 0.25) ? 'all-good' :
                         ((diff >= 0.25 && diff < 0.5) ? 'not-so-good' :
@@ -74,19 +74,11 @@ indicator.directive('indicatorWidget', [function (){
     };
 }]);
 
-indicator.directive('innerPath', function(){
+indicator.directive('pathGroup', function(){
     return {
-        restrict: 'A',
-        transclude: true,
-        requires: 'indicatorWidget',
+        requires: '^indicatorWidget',
         link: function(scope, element, attrs, ctrl){
-            var arc = d3.select(element[0]),
-                innerArc = scope.innerArc(),
-                color = (scope.diff < 0.25) ? 'all-good' :
-                        ((scope.diff >= 0.25 && scope.diff < 0.5) ? 'not-so-good' :
-                        'way-behind');
-
-            arc.attr('d', innerArc)
+            element
                 .attr(
                     "transform", 
                     "translate("+ scope.canvasWidth/2 + "," + scope.canvasHeight/2 + ")"
@@ -95,20 +87,33 @@ indicator.directive('innerPath', function(){
     };
 });
 
+indicator.directive('innerPath', function(){
+    return {
+        restrict: 'A',
+        transclude: true,
+        requires: '^indicatorWidget',
+        link: function(scope, element, attrs, ctrl){
+            var arc = d3.select(element[0]),
+                innerArc = scope.innerArc(),
+                color = (scope.diff < 0.25) ? 'all-good' :
+                        ((scope.diff >= 0.25 && scope.diff < 0.5) ? 'not-so-good' :
+                        'way-behind');
+
+            arc.attr('d', innerArc);
+        }
+    };
+});
+
 indicator.directive('outerPath', function(){
     return {
         restrict: 'A',
         transclude: true,
-        requires: 'indicatorWidget',
+        requires: '^indicatorWidget',
         link: function(scope, element, attrs){
             var arc = d3.select(element[0]),
                 innerArc = scope.outerArc();
 
-            arc.attr('d', innerArc)
-                .attr(
-                    "transform", 
-                    "translate("+ scope.canvasWidth/2 + "," + scope.canvasHeight/2 + ")"
-                );
+            arc.attr('d', innerArc);
 
             element.addClass(scope.findPathColor());
         }
