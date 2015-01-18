@@ -33,35 +33,53 @@ indicator.directive('indicatorWidget', [function (){
                 };
             }
             
+
+            $scope.buildArc = function(){
+                return d3
+                        .svg
+                        .arc()
+                        .innerRadius(function(d){
+                            return d.innerRadius;
+                        })
+                        .outerRadius(function(d){
+                            return d.outerRadius;
+                        })
+                        .startAngle(0)
+                        .endAngle(function(d){
+                            return d.endAngle;
+                        });
+            };
+
             $scope.findPathColor = function(){
                 return (diff < 0.25) ? 'all-good' :
                         ((diff >= 0.25 && diff < 0.5) ? 'not-so-good' :
                         'way-behind');
             };
 
-            $scope.innerArc = function(){
-                var end = findDegress($scope.expected),
-                    index = 1.1,
-                    arcValues = getArcValues(index, $scope.radius, 0.05);
+            $scope.getArcInfo = function(index, value, radius, spacing){
+                var end = findDegress(value),
+                    arcValues = getArcValues(index, radius, spacing);
 
-                return d3.svg.arc()
-                        .innerRadius(arcValues.innerRadius)
-                        .outerRadius(arcValues.outerRadius)
-                        .startAngle(0)
-                        .endAngle(convertToRads(end));
+
+                return {
+                    innerRadius: arcValues.innerRadius,
+                    outerRadius: arcValues.outerRadius,
+                    endAngle: convertToRads(end),
+                    startAngle: 0
+                };
             };
 
-            $scope.outerArc = function(){
-                var end = findDegress($scope.actual),
-                    index = 1.2,
-                    arcValues = getArcValues(index, $scope.radius, 0.1);
-
-                return d3.svg.arc()
-                        .innerRadius(arcValues.innerRadius)
-                        .outerRadius(arcValues.outerRadius)
-                        .startAngle(0)
-                        .endAngle(convertToRads(end));
-            };
+            $scope.tweenArc = function(b, arc){
+                return function(a) {
+                    var i = d3.interpolate(a, b);
+                    for(var key in b){
+                        a[key] = b[key];
+                    }
+                    return function(t) {
+                        return arc(i(t));
+                    };
+                };
+            }
         },
         templateUrl: 'indicator.html',
         link: function(scope, element, attrs){
@@ -91,15 +109,28 @@ indicator.directive('innerPath', function(){
     return {
         restrict: 'A',
         transclude: true,
-        requires: '^indicatorWidget',
+        requires: '^pathGroup',
         link: function(scope, element, attrs, ctrl){
             var arc = d3.select(element[0]),
-                innerArc = scope.innerArc(),
+                arcObject = scope.buildArc(),
+                innerArc = scope.getArcInfo(1.1, scope.expected, scope.radius, 0.05),
+                end = innerArc.endAngle,
                 color = (scope.diff < 0.25) ? 'all-good' :
                         ((scope.diff >= 0.25 && scope.diff < 0.5) ? 'not-so-good' :
                         'way-behind');
+        
 
-            arc.attr('d', innerArc);
+            
+            innerArc.endAngle = 0;
+            arc
+                .datum(innerArc)
+                .attr('d', arcObject)
+                .transition()
+                .delay(100)
+                .duration(2000)
+                .attrTween("d", scope.tweenArc({
+                    endAngle: end
+                }, arcObject));
         }
     };
 });
@@ -108,12 +139,24 @@ indicator.directive('outerPath', function(){
     return {
         restrict: 'A',
         transclude: true,
-        requires: '^indicatorWidget',
+        requires: '^pathGroup',
         link: function(scope, element, attrs){
             var arc = d3.select(element[0]),
-                innerArc = scope.outerArc();
+                arcObject = scope.buildArc(),
+                outerArc = scope.getArcInfo(1.2, scope.actual, scope.radius, 0.1),
+                end = outerArc.endAngle;
+            
+            outerArc.endAngle = 0;
+            arc
+                .datum(outerArc)
+                .attr('d', arcObject)
+                .transition()
+                .delay(200)
+                .duration(2500)
+                .attrTween("d", scope.tweenArc({
+                    endAngle: end
+                }, arcObject));
 
-            arc.attr('d', innerArc);
 
             element.addClass(scope.findPathColor());
         }
