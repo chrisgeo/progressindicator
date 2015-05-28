@@ -1,7 +1,10 @@
 progressindicator
 =================
-
 Progress indicator using Angular JS
+
+http://www.chrisgeorge.me/progressindicator/
+
+
 
 PROBLEM
 ========
